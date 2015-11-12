@@ -1,6 +1,6 @@
 define([
     'jquery',
-    'i18n!nls/i18n',
+    'i18n!nls/translate',
     'libs/jshashtable'
 ], function ($, i18n) {
 

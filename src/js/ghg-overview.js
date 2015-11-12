@@ -3,7 +3,7 @@ define([
     'handlebars',
     'text!html/template.html',
     'config/queries.js',
-    'i18n!nls/i18n',
+    'i18n!nls/translate',
     'libs/pivot-table',
     'libs/f3-ghg-chart',
     'chosen',
