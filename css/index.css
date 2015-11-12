@@ -5,7 +5,6 @@
 }
 
 .dataTable tbody tr:hover td {
-    /*background-color:#399BCC;*/
     background-color:#2471AA;
     color: #FFFFFF;
 }
