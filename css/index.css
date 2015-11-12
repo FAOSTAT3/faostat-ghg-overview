@@ -1,0 +1,48 @@
+.hor-minimalist-b_row1 {
+    background-color: #FFFFFF !important;
+}
+
+.hor-minimalist-b_row2 {
+    background-color: #F4F4F4 !important;
+}
+
+.dataTable th {
+    padding: 4px 6px 4px 6px !important;
+    margin:0px !important;
+}
+
+.dataTable td  {
+    padding: 8px 8px 8px 8px !important;
+    margin:0px !important;
+}
+
+#table_1 td,#table_2 td {
+    padding: 8px 8px 8px 8px !important;
+    margin:0px !important;
+    border-bottom: 1px solid #90AEC3;
+}
+
+.dataTable thead th {
+    background-color: #90AEC3 !important;
+    border-image: none !important;
+    font-weight: normal !important;
+    color: #FFFFFF !important;
+    font-size: 12px !important;
+    height: 20px !important;
+    margin-bottom: 0 !important;
+    text-align: left !important;
+    vertical-align: middle !important;
+}
+
+.dataTable thead th:first-child{
+    border-left: none !important;
+}
+
+.dataTable thead a {
+    text-decoration:none !important;
+    color:#444444 !important;
+}
+
+.dataTable thead a:hover {
+    text-decoration: underline !important;
+}

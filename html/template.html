@@ -1,0 +1,156 @@
+<div class='container-fluid'>
+    <div class="row">
+        <div class="col-xs-8">
+            <h1>{{ghg_overview_title}}</h1>
+        </div>
+
+<!--        <div class="col-xs-4">
+            <h3 class='instructions pull-right' id='user_guide_top'>
+                <i class="fa fa-file-pdf-o"></i>{{user_instructions}}
+            </h3>
+        </div>-->
+    </div>
+
+    <div class="row">
+        <div class="col-xs-5">
+            <h4>{{country}}</h4>
+            <select style='width:100%' id="fs_country_list" multiple data-placeholder={{select_one_or_more_countries}}></select>
+        </div>
+        <div class="col-xs-2" >
+            <h4>{{fromyear}}</h4>
+            <select style='width:100%' id="fs_from_year_list"></select>
+        </div>
+        <div class="col-xs-2">
+            <h4>{{toyear}}</h4>
+            <select style='width:100%' id="fs_to_year_list"></select>
+        </div>
+        <div class="col-xs-3">
+            <h4>{{sector}}</h4>
+            <select style="width:100%" id="fs_sectors_list">
+                <option>{{agriculture}}</option>
+                <option disabled>{{land_use}}</option>
+            </select>
+
+        </div>
+    </div>
+    <hr>
+    <div class="row" id="fs_overview_note_panel">
+        <div class="col-xs-12">
+            <h3 class="text-center" id="fs_overview_note"></h3>
+            <h3 id="fs_overview_subnote"></h3>
+        </div>
+    </div>
+
+</div>
+
+<div id="fs_overview_panel" class='container-fluid' style="display:none;">
+    <div class="row">
+        <div class="col-xs-6">
+            <div id="fs_country_total">
+                <h2>{{countries}}</h2>
+                <div class="fs_overview_subtitle" id="fs_country_total_name"></div>
+                <b><span id="fs_country_total_value"></span></b>
+                <span class="overview_mu"><i>{{gg_co2eq}}</i></span>
+            </div>
+            <div id="fs_country_chart" class="fs-overview-chart-pie"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+
+        <div class="col-xs-6">
+            <div id="fs_region_total">
+                <h2>{{regions}}</h2>
+                <div class="fs_overview_subtitle" id="fs_region_total_name"></div>
+                <b><span id="fs_region_total_value"></span></b>
+                <span class="overview_mu"><i>{{gg_co2eq}}</i></span>
+            </div>
+            <div  id="fs_region_chart" class="fs-overview-chart-pie"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-6">
+            <div id="fs_continent_total">
+                <h2>{{continents}}</h2>
+                <div class="fs_overview_subtitle" id="fs_continent_total_name"></div>
+                <b><span id="fs_continent_total_value"></span></b>
+                <span class="overview_mu"><i>{{gg_co2eq}}</i></span>
+            </div>
+            <div id="fs_continent_chart" class="fs-overview-chart-pie"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+        <div class="col-xs-6">
+            <div id="fs_world_total">
+                <h2>{{world}}</h2>
+                <div class="fs_overview_subtitle">{{agriculture_total}}</div>
+                <b><span id="fs_world_total_value"></span></b>
+                <span class="overview_mu"><i>{{gg_co2eq}}</i></span>
+            </div>
+            <div id="fs_world_chart" class="fs-overview-chart-pie"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>{{agriculture_total}} ({{country_region}})</h2>
+            <div id="fs_agriculture_total_chart" class="fs-overview-chart-total"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-4">
+            <h2>{{enteric_fermentation}} ({{sum_of_countries}})</h2>
+            <div id="fs_chart_0" class="ghg-small-charts"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+        <div class="col-xs-4">
+            <h2>{{manure_management}} ({{sum_of_countries}})</h2>
+            <div id="fs_chart_1" class="ghg-small-charts"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+        <div class="col-xs-4">
+            <h2>{{agricultural_soils}} ({{sum_of_countries}})</h2>
+            <div id="fs_chart_2" class="ghg-small-charts"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-4">
+            <h2>{{rice_cultivation}} ({{sum_of_countries}})</h2>
+            <div  id="fs_chart_3" class="ghg-small-charts"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+        <div class="col-xs-4">
+            <h2>{{burning_crops_residues}} ({{sum_of_countries}})</h2>
+            <div id="fs_chart_4" class="ghg-small-charts"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+        <div class="col-xs-4">
+            <h2>{{burning_savanna}} ({{sum_of_countries}})</h2>
+            <div id="fs_chart_5" class="ghg-small-charts"><i class='fa fa-refresh fa-spin fa-2x'></i></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <button id="fs-overview-tables-button" class='btn btn-default'><i class='fa fa-compress'></i> {{show_hide_table_breakdown}}</button>
+        </div>
+    </div>
+
+    <div id="fs-overview-tables" style="display:none">
+        <div class="row">
+            <div class="col-xs-12" id="fs_world_table">
+                <i class='fa fa-refresh fa-spin fa-2x'></i>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12" id="fs_continent_table">
+                <i class='fa fa-refresh fa-spin fa-2x'></i>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12" id="fs_region_table">
+                <i class='fa fa-refresh fa-spin fa-2x'></i>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12" id="fs_country_table">
+                <i class='fa fa-refresh fa-spin fa-2x'></i>
+            </div>
+        </div>
+    </div>
+
+</div>
