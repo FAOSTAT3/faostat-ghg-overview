@@ -5,7 +5,7 @@ define([
 
     'use strict';
 
-    function F3_CHART() {
+    function CHART() {
 
         var COLORS = [
             '#379bcd',
@@ -227,6 +227,6 @@ define([
 
     }
 
-    return F3_CHART;
+    return CHART;
 });
 
