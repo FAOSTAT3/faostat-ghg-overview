@@ -76,6 +76,7 @@ define([
         };
 
         return this;
+        
     };
 
     GHG_OVERVIEW.prototype.init = function(config){
