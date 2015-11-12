@@ -1,48 +1,44 @@
-.hor-minimalist-b_row1 {
-    background-color: #FFFFFF !important;
+.dataTable {
+    border: 1px solid #E6E6E6;
+    border-collapse: collapse;
+    font-size:12px;
 }
 
-.hor-minimalist-b_row2 {
-    background-color: #F4F4F4 !important;
+.dataTable tbody tr:hover td {
+    /*background-color:#399BCC;*/
+    background-color:#2471AA;
+    color: #FFFFFF;
 }
 
 .dataTable th {
-    padding: 4px 6px 4px 6px !important;
-    margin:0px !important;
+    padding: 4px 6px 4px 6px;
+    margin: 0px;
 }
 
 .dataTable td  {
-    padding: 8px 8px 8px 8px !important;
-    margin:0px !important;
-}
-
-#table_1 td,#table_2 td {
-    padding: 8px 8px 8px 8px !important;
-    margin:0px !important;
-    border-bottom: 1px solid #90AEC3;
+    padding: 8px 8px 8px 8px;
+    margin: 0px;
 }
 
 .dataTable thead th {
-    background-color: #90AEC3 !important;
-    border-image: none !important;
-    font-weight: normal !important;
-    color: #FFFFFF !important;
-    font-size: 12px !important;
-    height: 20px !important;
-    margin-bottom: 0 !important;
-    text-align: left !important;
-    vertical-align: middle !important;
+    background-color: #90AEC3;
+    border-image: none;
+    font-weight: normal;
+    color: #FFFFFF;
+    font-size: 12px;
+    height: 20px;
+    margin-bottom: 0;
+    text-align: left;
+    vertical-align: middle;
 }
 
-.dataTable thead th:first-child{
-    border-left: none !important;
+.hor-minimalist-b_row1 {
+    background-color: #FFFFFF;
 }
 
-.dataTable thead a {
-    text-decoration:none !important;
-    color:#444444 !important;
+.hor-minimalist-b_row2 {
+    background-color: #F4F4F4;
 }
-
-.dataTable thead a:hover {
-    text-decoration: underline !important;
+.hor-minimalist-b_row-bold {
+    font-weight:bold
 }

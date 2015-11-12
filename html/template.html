@@ -34,10 +34,9 @@
         </div>
     </div>
     <hr>
-    <div class="row" id="fs_overview_note_panel">
+    <div class="row" id="fs_overview_note">
         <div class="col-xs-12">
-            <h3 class="text-center" id="fs_overview_note"></h3>
-            <h3 id="fs_overview_subnote"></h3>
+            <h4>{{{ghg_overview_note}}}</h4>
         </div>
     </div>
 
@@ -132,9 +131,17 @@
 
     <div id="fs-overview-tables" style="display:none">
         <div class="row">
+            <div class='col-xs-9'><h1>{{world}}</h1></div>
+            <div id='fs_world_table_export' class='col-xs-3' style='cursor:pointer'><h1 class="pull-right"><i class='fa fa-download'></i> {{export}}</h1></div>
+        </div>
+        <div class="row">
             <div class="col-xs-12" id="fs_world_table">
                 <i class='fa fa-refresh fa-spin fa-2x'></i>
             </div>
+        </div>
+        <div class="row">
+            <div class='col-xs-9'><h1>{{by_continent}}</h1></div>
+            <div id='fs_continent_table_export' class='col-xs-3' style='cursor:pointer'><h1 class="pull-right"><i class='fa fa-download'></i> {{export}}</h1></div>
         </div>
         <div class="row">
             <div class="col-xs-12" id="fs_continent_table">
@@ -142,9 +149,17 @@
             </div>
         </div>
         <div class="row">
+            <div class='col-xs-9'><h1>{{by_region}}</h1></div>
+            <div id='fs_region_table_export' class='col-xs-3' style='cursor:pointer'><h1 class="pull-right"><i class='fa fa-download'></i> {{export}}</h1></div>
+        </div>
+        <div class="row">
             <div class="col-xs-12" id="fs_region_table">
                 <i class='fa fa-refresh fa-spin fa-2x'></i>
             </div>
+        </div>
+        <div class="row">
+            <div class='col-xs-9'><h1>{{by_country}}</h1></div>
+            <div id='fs_country_table_export' class='col-xs-3' style='cursor:pointer'><h1 class="pull-right"><i class='fa fa-download'></i> {{export}}</h1></div>
         </div>
         <div class="row">
             <div class="col-xs-12" id="fs_country_table">

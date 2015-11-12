@@ -31,5 +31,8 @@ define({
     'continent': 'Continente',
     'region': 'Región',
     'total': 'Total',
-    'pie_mu': 'Gg CO2eq'
+    'pie_mu': 'Gg CO2eq',
+    'user_instructions': 'User Instructions',
+    'export': 'Exportar',
+    'avg': 'Promedio'
 });

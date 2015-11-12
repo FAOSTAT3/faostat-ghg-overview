@@ -6,31 +6,16 @@ define([
 
     'use strict';
 
-    function GHG_TABLE() {
-
-        /** TODO: check how many series there are and create the rows based on the series that are currently in the json **/
+    function TABLE() {
 
         var CONFIG = {
             prefix: null,
             placeholder: 'id',
+            export_id: '',
             decimal_values: 0,
             add_first_column: true
         };
 
-        function initCountryProfile(config, years, json) {
-
-            CONFIG = $.extend(true, {}, CONFIG, config);
-
-            if (CONFIG.prefix === null) {
-                CONFIG.prefix = CONFIG.placeholder;
-            }
-
-            CONFIG.rows_content = countRows(json);
-
-            createHtmlTitle(CONFIG.placeholder);
-            createTableCountryProfile(CONFIG.placeholder, CONFIG.table, years, json);
-
-        }
 
         function init(config, years, json) {
 
@@ -41,24 +26,14 @@ define([
 
             CONFIG.rows_content = countRows(json);
 
-            createHtmlTitle(CONFIG.placeholder);
             createHtmlTable(CONFIG.placeholder, years, json);
             fillTable(json);
 
-        }
-
-        function createHtmlTitle(id) {
-            var exportID = CONFIG.prefix + "_export_data";
-            var html =
-                "<div class='row' style=''>" +
-                "<div class='col-xs-12 col-sm-8 col-md-8 col-lg-8'><h1>" + CONFIG.title + "</h1></div>" +
-                "<div class='col-xs-12 col-sm-4 col-md-4 col-lg-4'><h1 id=" + exportID + " style='text-align: right; cursor:pointer;'><i class='fa fa-download'></i> " + i18n.export + "</h1></div>" +
-                "</div>";
-            $("#" + id).append(html);
-
-            $('#' + exportID).on('click', function () {
-                exportTableToCSV($("#" + id), CONFIG.title.toLocaleLowerCase() + ' data.csv')
+            CONFIG.export_id = CONFIG.export_id || CONFIG.prefix + '_export';
+            $('#' + CONFIG.export_id).on('click', function() {
+                exportTableToCSV($('#' + CONFIG.prefix), CONFIG.title.toLocaleLowerCase() + ' data.csv');
             });
+
         }
 
         function createHtmlTable(id, years) {
@@ -69,8 +44,9 @@ define([
             // Headers
             s += "<thead>";
             s += "<tr>";
-            if (CONFIG.add_first_column)
+            if (CONFIG.add_first_column) {
                 s += "<th>" + CONFIG.header.column_0 + "</th>";
+            }
             s += "<th>" + CONFIG.header.column_1 + "</th>";
             // Average
             s += "<th>" + i18n.avg + " " + years[0] + "-" + years[years.length - 1] + "</th>";
@@ -83,13 +59,13 @@ define([
 
             // Rows
             s += "<tbody>";
-            var classDiv = "";
             var count = 0;
             for (var i = 0; i < CONFIG.rows_content; i++) {
-                classDiv = "hor-minimalist-b_row" + ((i % 2) + 1);
+                var classDiv = "hor-minimalist-b_row" + ((i % 2) + 1);
                 s += "<tr>";
-                if (CONFIG.add_first_column)
+                if (CONFIG.add_first_column) {
                     s += "<td class='" + classDiv + "' id='" + CONFIG.prefix + "_" + i + "_0'>-</td>";
+                }
                 s += "<td class='" + classDiv + "' id='" + CONFIG.prefix + "_" + i + "_1'>-</td>";
                 s += "<td class='" + classDiv + "' id='" + CONFIG.prefix + "_avg_" + i + "'>-</td>";
                 years.forEach(function (y) {
@@ -100,14 +76,16 @@ define([
             }
 
             // Total
-            classDiv = "hor-minimalist-b_row" + ((count % 2) + 1);
+            var classDiv = "hor-minimalist-b_row" + ((count % 2) + 1) + " hor-minimalist-b_row-bold";
+
             s += "<tr>";
-            if (CONFIG.add_first_column)
-                s += "<td style='font-weight:bold;' class='" + classDiv + "' id='" + CONFIG.prefix + "_total_0'>" + CONFIG.total.column_0 + "</td>";
-            s += "<td style='font-weight:bold;' class='" + classDiv + "' id='" + CONFIG.prefix + "_total_1'>" + CONFIG.total.column_1 + "</td>";
-            s += "<td style='font-weight:bold;' class='" + classDiv + "' id='" + CONFIG.prefix + "_total_avg'>-</td>";
+            if (CONFIG.add_first_column) {
+                s += "<td class='" + classDiv + "' id='" + CONFIG.prefix + "_total_0'>" + CONFIG.total.column_0 + "</td>";
+            }
+            s += "<td class='" + classDiv + "' id='" + CONFIG.prefix + "_total_1'>" + CONFIG.total.column_1 + "</td>";
+            s += "<td class='" + classDiv + "' id='" + CONFIG.prefix + "_total_avg'>-</td>";
             years.forEach(function (y) {
-                s += "<td style='font-weight:bold;' class='" + classDiv + "' id='" + CONFIG.prefix + "_total_" + y + "'>-</td>"
+                s += "<td class='" + classDiv + "' id='" + CONFIG.prefix + "_total_" + y + "'>-</td>"
             });
             s += "</tr>";
             s += "</tbody>";
@@ -275,10 +253,9 @@ define([
         }
 
         return {
-            init: init,
-            initCountryProfile: initCountryProfile
+            init: init
         };
     }
 
-    return GHG_TABLE;
+    return TABLE;
 });

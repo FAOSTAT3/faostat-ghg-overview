@@ -4,12 +4,12 @@ define([
     'text!html/template.html',
     'config/queries.js',
     'i18n!nls/i18n',
-    'libs/f3-ghg-table',
+    'libs/pivot-table',
     'libs/f3-ghg-chart',
     'chosen',
     'highcharts',
     'highcharts_exporting'
-], function ($, Handlebars, template, queries, i18n, GHG_TABLE, GHG_CHART) {
+], function ($, Handlebars, template, queries, i18n, Table, Chart) {
 
     'use strict';
 
@@ -64,13 +64,14 @@ define([
                 to_year_list: "#fs_to_year_list",
                 sectors_list: "#fs_sectors_list",
 
-
                 domains: "#fs_overview_domains",
                 table: "#fs-overview-tables",
                 table_button: "#fs-overview-tables-button",
                 overview_panel: "#fs_overview_panel",
                 world_total: '#fs_world_total',
-                country_total_name: '#fs_country_total_name'
+                country_total_name: '#fs_country_total_name',
+                note: '#fs_overview_note',
+
             }
         };
 
@@ -110,6 +111,7 @@ define([
         this.$TABLE_BUTTON = this.$CONTRAINER.find(this.CONFIG.s.table_button);
         this.$OVERVIEW_PANEL =  this.$CONTRAINER.find(this.CONFIG.s.overview_panel);
         this.$COUNTRY_TOTAL_NAME =  this.$CONTRAINER.find(this.CONFIG.s.country_total_name);
+        this.$NOTE =  this.$CONTRAINER.find(this.CONFIG.s.note);
 
     };
 
@@ -180,7 +182,7 @@ define([
 
         var options = [];
         for(var year = toyear; year >= fromyear; year--) {
-            if(defaultCodes.indexOf(year) > -1) {
+            if( defaultCodes.indexOf(year) > -1 ) {
                 options.push('<option selected value="' + year + '">' + year + '</option>');
             }else{
                 options.push('<option value="' + year + '">' + year + '</option>');
@@ -205,32 +207,27 @@ define([
         this.CONFIG.selected_from_year = this.$FROM_YEAR.val();
         this.CONFIG.selected_to_year = this.$TO_YEAR.val();
 
-        // hide note panel
-        this.$OVERVIEW_PANEL.hide();
-
         if (this.CONFIG.selected_areacodes !== null) {
             // show panel
+            this.$NOTE.hide();
             this.$OVERVIEW_PANEL.show();
 
             // update views
-            this.updateCountryBox(queries);
-            this.updateWorldBox(queries);
-            this.updateContinentBox(queries);
-            this.updateSubRegionBox(queries);
-
-            this.updateTableWorld(queries);
+            this.updateCountryBoxes(queries);
+            this.updateWorldBoxes(queries);
+            this.updateContinentBoxes(queries);
+            this.updateSubRegionBoxes(queries);
 
             this.updateChartsByCountries(queries);
-
-            // this changes the div with the names of the countries
-            this.updateCountryListNames();
         }
         else{
+            this.$NOTE.show();
             this.$OVERVIEW_PANEL.hide();
         }
+
     };
 
-    GHG_OVERVIEW.prototype.updateWorldBox = function(json) {
+    GHG_OVERVIEW.prototype.updateWorldBoxes = function(json) {
 
         var obj = this.getConfigurationObject(),
             // world code
@@ -248,11 +245,13 @@ define([
         var chart_obj = obj;
         chart_obj.areacode = arecode;
         query_chart = this.replaceValues(query_chart, chart_obj);
+
         this.createChart("fs_world_chart", query_chart.sql, "pie");
+        this.updateTableWorld(queries);
 
     };
 
-    GHG_OVERVIEW.prototype.updateContinentSubRegionBox = function(json, query, config) {
+    GHG_OVERVIEW.prototype.updateContinentSubRegionBoxes = function(json, query, config) {
 
         var self = this,
             query_total = query,
@@ -279,7 +278,7 @@ define([
                     labels.push(response[i][1]);
                 }
 
-                self.updateAreasBox(json, config.id, codes.join(","), labels.join(','));
+                self.createChartAreaBox(json, config.id, codes.join(","), labels.join(','));
                 self.updateAreasTable(config, json.byarea_table, codes.join(","));
 
                 if ( updateTimeserieAgricultureTotal ) {
@@ -294,9 +293,9 @@ define([
         });
     };
 
-    GHG_OVERVIEW.prototype.updateContinentBox = function(json) {
+    GHG_OVERVIEW.prototype.updateContinentBoxes = function(json) {
 
-        this.updateContinentSubRegionBox(json, json.query_regions, {
+        this.updateContinentSubRegionBoxes(json, json.query_regions, {
                 id: "fs_continent",
                 placeholder: "fs_continent_table",
                 title: i18n.by_continent,
@@ -316,9 +315,9 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateSubRegionBox = function(json) {
+    GHG_OVERVIEW.prototype.updateSubRegionBoxes = function(json) {
 
-        this.updateContinentSubRegionBox(json, json.query_sub_regions, {
+        this.updateContinentSubRegionBoxes(json, json.query_sub_regions, {
             id: "fs_region",
             placeholder: "fs_region_table",
             title: i18n.by_region,
@@ -389,20 +388,7 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateCountryListNames = function() {
-
-        var values = this.$COUNTRY_LIST.find("option:selected");
-        var labels = [];
-        if ( typeof values == "object") {
-            for (var i = 0; i < values.length; i++) {
-                labels.push(values[i].text);
-            }
-        }
-        this.$COUNTRY_TOTAL_NAME.html(labels.join(", "));
-
-    };
-
-    GHG_OVERVIEW.prototype.updateCountryBox = function(json) {
+    GHG_OVERVIEW.prototype.updateCountryBoxes = function(json) {
 
       var codes = this.getQueryAreaCodes(),
           id = "fs_country",
@@ -424,12 +410,26 @@ define([
             add_first_column: true
         };
 
-        this.updateAreasBox(json, id, codes, null);
+        this.updateCountryListNames();
+        this.createChartAreaBox(json, id, codes, null);
         this.updateAreasTable(config, json.byarea_table, codes);
 
     };
 
-    GHG_OVERVIEW.prototype.updateAreasBox = function(json, id, areacode, areanames) {
+    GHG_OVERVIEW.prototype.updateCountryListNames = function() {
+
+        var values = this.$COUNTRY_LIST.find("option:selected");
+        var labels = [];
+        if ( typeof values == "object") {
+            for (var i = 0; i < values.length; i++) {
+                labels.push(values[i].text);
+            }
+        }
+        this.$COUNTRY_TOTAL_NAME.html(labels.join(", "));
+
+    };
+
+    GHG_OVERVIEW.prototype.createChartAreaBox = function(json, id, areacode, areanames) {
 
         var obj = this.getConfigurationObject(),
             query_total = json.byarea_total,
@@ -505,7 +505,7 @@ define([
                     // get colors
                     chartObj.colors = colors || null;
 
-                    var c = new GHG_CHART();
+                    var c = new Chart();
                     switch (type) {
                         case "pie" :
                             chartObj.serie = {
@@ -600,7 +600,7 @@ define([
             data : data,
             success : function(response) {
                 $('#' + config.placeholder).empty();
-                var table = new GHG_TABLE();
+                var table = new Table();
                 table.init(config, years, response);
             },
             error : function(err, b, c) {}
