@@ -76,7 +76,7 @@ define([
         };
 
         return this;
-        
+
     };
 
     GHG_OVERVIEW.prototype.init = function(config){
@@ -95,10 +95,8 @@ define([
 
     GHG_OVERVIEW.prototype.initTemplate = function() {
 
-        var t, html;
-        t = Handlebars.compile(template);
-        html = t(i18n);
-        this.$CONTRAINER.html(html);
+        var t = Handlebars.compile(template);
+        this.$CONTRAINER.html(t(i18n));
 
     };
 
