@@ -68,8 +68,7 @@ define([], function () {
                         }
                     }
                 }
-            }
-            ,
+            },
             legend: {
                 align: 'right',
                 verticalAlign: 'middle',

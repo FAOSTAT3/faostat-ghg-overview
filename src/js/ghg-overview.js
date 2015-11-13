@@ -4,12 +4,11 @@ define([
     'text!html/template.html',
     'config/queries.js',
     'i18n!nls/translate',
-    'libs/pivot-table',
-    'libs/f3-ghg-chart',
-    'chosen',
-    'highcharts',
-    'highcharts_exporting'
-], function ($, Handlebars, template, queries, i18n, Table, Chart) {
+    'wide-table',
+    'f3-ghg-chart',
+    'config/highcharts-config.js',
+    'chosen'
+], function ($, Handlebars, template, queries, i18n, Table, Chart, HighChartsConfig) {
 
     'use strict';
 
@@ -25,7 +24,7 @@ define([
 
             // Values used in the queries
             domaincode: 'GT',
-            itemcode: ['1709','5066','5067','5058','5059','5060'],
+            itemcode: ['1709', '5066', '5067', '5058', '5059', '5060'],
             elementcode: ['7231'],
             selected_aggregation: "AVG",
 
@@ -39,7 +38,7 @@ define([
             selected_areacodes: [],
             selected_from_year: [1990],
             selected_to_year: [2012],
-            timerange:[1990, 2012],
+            timerange: [1990, 2012],
 
             decimal_values: 2,
             colors: {
@@ -53,8 +52,8 @@ define([
                 }
             },
 
-            alternative_colors: ['#1f678a','#92a8b7','#5eadd5','#6c79db','#a68122','#ffd569','#439966','#800432','#067dcc',
-                '#1f678a','#92a8b7','#5eadd5','#6c79db','#a68122','#ffd569','#439966','#800432','#067dcc'
+            alternative_colors: ['#1f678a', '#92a8b7', '#5eadd5', '#6c79db', '#a68122', '#ffd569', '#439966', '#800432', '#067dcc',
+                '#1f678a', '#92a8b7', '#5eadd5', '#6c79db', '#a68122', '#ffd569', '#439966', '#800432', '#067dcc'
             ],
 
             // selectors
@@ -79,7 +78,7 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.init = function(config){
+    GHG_OVERVIEW.prototype.init = function (config) {
 
         // get configuration changes
         this.CONFIG = $.extend(true, {}, this.CONFIG, config);
@@ -93,14 +92,14 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.initTemplate = function() {
+    GHG_OVERVIEW.prototype.initTemplate = function () {
 
         var t = Handlebars.compile(template);
         this.$CONTRAINER.html(t(i18n));
 
     };
 
-    GHG_OVERVIEW.prototype.initVariables = function() {
+    GHG_OVERVIEW.prototype.initVariables = function () {
 
         this.$COUNTRY_LIST = this.$CONTRAINER.find(this.CONFIG.s.country_list);
         this.$FROM_YEAR = this.$CONTRAINER.find(this.CONFIG.s.from_year_list);
@@ -108,13 +107,13 @@ define([
         this.$SECTOR_LIST = this.$CONTRAINER.find(this.CONFIG.s.sectors_list);
 
         this.$TABLE_BUTTON = this.$CONTRAINER.find(this.CONFIG.s.table_button);
-        this.$OVERVIEW_PANEL =  this.$CONTRAINER.find(this.CONFIG.s.overview_panel);
-        this.$COUNTRY_TOTAL_NAME =  this.$CONTRAINER.find(this.CONFIG.s.country_total_name);
-        this.$NOTE =  this.$CONTRAINER.find(this.CONFIG.s.note);
+        this.$OVERVIEW_PANEL = this.$CONTRAINER.find(this.CONFIG.s.overview_panel);
+        this.$COUNTRY_TOTAL_NAME = this.$CONTRAINER.find(this.CONFIG.s.country_total_name);
+        this.$NOTE = this.$CONTRAINER.find(this.CONFIG.s.note);
 
     };
 
-    GHG_OVERVIEW.prototype.initUI = function() {
+    GHG_OVERVIEW.prototype.initUI = function () {
 
         // Populate DropDowns
         this.populateCountriesDD({disable_search_threshold: 10});
@@ -125,13 +124,13 @@ define([
 
         // show/hide table
         var self = this;
-        this.$TABLE_BUTTON.on('click', function() {
+        this.$TABLE_BUTTON.on('click', function () {
             $(self.CONFIG.s.table).toggle();
         });
 
     };
 
-    GHG_OVERVIEW.prototype.populateCountriesDD = function(chosen_parameters) {
+    GHG_OVERVIEW.prototype.populateCountriesDD = function (chosen_parameters) {
 
         var self = this,
             defaultCodes = this.CONFIG.selected_areacodes,
@@ -140,11 +139,11 @@ define([
         $.ajax({
             url: url,
             type: 'GET',
-            dataType:'json',
+            dataType: 'json',
             success: function (response) {
 
                 self.$COUNTRY_LIST.append(self.populateDD(response, defaultCodes));
-                self.$COUNTRY_LIST.on('change', function() {
+                self.$COUNTRY_LIST.on('change', function () {
                     self.updateView();
                 });
 
@@ -155,18 +154,20 @@ define([
                 }
 
             },
-            error: function (a, b, c) {console.error(a, b, c);}
+            error: function (a, b, c) {
+                console.error(a, b, c);
+            }
         });
 
     };
 
-    GHG_OVERVIEW.prototype.populateDD = function(values, defaultCodes) {
+    GHG_OVERVIEW.prototype.populateDD = function (values, defaultCodes) {
 
         var options = [];
-        for(var i=0; i < values.length; i++) {
-            if( defaultCodes.indexOf(values[i][0]) > -1) {
+        for (var i = 0; i < values.length; i++) {
+            if (defaultCodes.indexOf(values[i][0]) > -1) {
                 options.push('<option selected value="' + values[i][0] + '">' + values[i][1] + '</option>')
-            }else{
+            } else {
                 options.push('<option value="' + values[i][0] + '">' + values[i][1] + '</option>')
             }
         }
@@ -174,16 +175,16 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.populateYearsDD = function($DD, defaultCodes, chosen_parameters) {
+    GHG_OVERVIEW.prototype.populateYearsDD = function ($DD, defaultCodes, chosen_parameters) {
 
         var fromyear = this.CONFIG.timerange[0],
             toyear = this.CONFIG.timerange[1];
 
         var options = [];
-        for(var year = toyear; year >= fromyear; year--) {
-            if( defaultCodes.indexOf(year) > -1 ) {
+        for (var year = toyear; year >= fromyear; year--) {
+            if (defaultCodes.indexOf(year) > -1) {
                 options.push('<option selected value="' + year + '">' + year + '</option>');
-            }else{
+            } else {
                 options.push('<option value="' + year + '">' + year + '</option>');
             }
         }
@@ -192,7 +193,7 @@ define([
         $DD.append(options.join());
 
         var self = this;
-        $DD.on('change', function() {
+        $DD.on('change', function () {
             self.updateView();
         });
 
@@ -200,7 +201,7 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateView = function() {
+    GHG_OVERVIEW.prototype.updateView = function () {
 
         this.CONFIG.selected_areacodes = this.$COUNTRY_LIST.val();
         this.CONFIG.selected_from_year = this.$FROM_YEAR.val();
@@ -219,17 +220,17 @@ define([
 
             this.updateChartsByCountries(queries);
         }
-        else{
+        else {
             this.$NOTE.show();
             this.$OVERVIEW_PANEL.hide();
         }
 
     };
 
-    GHG_OVERVIEW.prototype.updateWorldBoxes = function(json) {
+    GHG_OVERVIEW.prototype.updateWorldBoxes = function (json) {
 
         var obj = this.getConfigurationObject(),
-            // world code
+        // world code
             arecode = ['5000'],
             query_total = json.world_total;
 
@@ -250,7 +251,7 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateContinentSubRegionBoxes = function(json, query, config) {
+    GHG_OVERVIEW.prototype.updateContinentSubRegionBoxes = function (json, query, config) {
 
         var self = this,
             query_total = query,
@@ -265,14 +266,14 @@ define([
         data.datasource = this.CONFIG.datasource;
         data.json = JSON.stringify(query_total.sql);
         $.ajax({
-            type : 'POST',
-            url : this.CONFIG.baseurl + this.CONFIG.baseurl_data,
-            data : data,
-            success : function(response) {
+            type: 'POST',
+            url: this.CONFIG.baseurl + this.CONFIG.baseurl_data,
+            data: data,
+            success: function (response) {
 
                 var codes = [];
                 var labels = [];
-                for ( var i=0; i < response.length; i++) {
+                for (var i = 0; i < response.length; i++) {
                     codes.push(response[i][0]);
                     labels.push(response[i][1]);
                 }
@@ -280,7 +281,7 @@ define([
                 self.createChartAreaBox(json, config.id, codes.join(","), labels.join(','));
                 self.updateAreasTable(config, json.byarea_table, codes.join(","));
 
-                if ( updateTimeserieAgricultureTotal ) {
+                if (updateTimeserieAgricultureTotal) {
                     self.updateTimeserieAgricultureTotal(json, codes.join(","));
                 }
 
@@ -292,29 +293,29 @@ define([
         });
     };
 
-    GHG_OVERVIEW.prototype.updateContinentBoxes = function(json) {
+    GHG_OVERVIEW.prototype.updateContinentBoxes = function (json) {
 
         this.updateContinentSubRegionBoxes(json, json.query_regions, {
-                id: "fs_continent",
-                placeholder: "fs_continent_table",
-                title: i18n.by_continent,
-                header: {
-                    column_0: i18n.region,
-                    column_1: i18n.category
-                },
-                content: {
-                    column_0: ""
-                },
-                total: {
-                    column_0: i18n.total,
-                    column_1:  i18n.agriculture_total
-                },
-                add_first_column: true
+            id: "fs_continent",
+            placeholder: "fs_continent_table",
+            title: i18n.by_continent,
+            header: {
+                column_0: i18n.region,
+                column_1: i18n.category
+            },
+            content: {
+                column_0: ""
+            },
+            total: {
+                column_0: i18n.total,
+                column_1: i18n.agriculture_total
+            },
+            add_first_column: true
         });
 
     };
 
-    GHG_OVERVIEW.prototype.updateSubRegionBoxes = function(json) {
+    GHG_OVERVIEW.prototype.updateSubRegionBoxes = function (json) {
 
         this.updateContinentSubRegionBoxes(json, json.query_sub_regions, {
             id: "fs_region",
@@ -328,7 +329,7 @@ define([
                 column_0: ""
             },
             total: {
-                column_0:i18n.total,
+                column_0: i18n.total,
                 column_1: i18n.agriculture_total
             },
             add_first_column: true,
@@ -337,7 +338,7 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateChartsByCountries = function(json) {
+    GHG_OVERVIEW.prototype.updateChartsByCountries = function (json) {
 
         var obj = this.getConfigurationObject(),
             areacodes = this.getQueryAreaCodes();
@@ -387,27 +388,27 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateCountryBoxes = function(json) {
+    GHG_OVERVIEW.prototype.updateCountryBoxes = function (json) {
 
-      var codes = this.getQueryAreaCodes(),
-          id = "fs_country",
-          id_table = id + "_table",
-          config = {
-            placeholder : id_table,
-            title: i18n.by_country,
-            header: {
-                column_0: i18n.country,
-                column_1: i18n.category
-            },
-            content: {
-                column_0: ""
-            },
-            total: {
-                column_0:i18n.total,
-                column_1: i18n.agriculture_total
-            },
-            add_first_column: true
-        };
+        var codes = this.getQueryAreaCodes(),
+            id = "fs_country",
+            id_table = id + "_table",
+            config = {
+                placeholder: id_table,
+                title: i18n.by_country,
+                header: {
+                    column_0: i18n.country,
+                    column_1: i18n.category
+                },
+                content: {
+                    column_0: ""
+                },
+                total: {
+                    column_0: i18n.total,
+                    column_1: i18n.agriculture_total
+                },
+                add_first_column: true
+            };
 
         this.updateCountryListNames();
         this.createChartAreaBox(json, id, codes, null);
@@ -415,11 +416,11 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateCountryListNames = function() {
+    GHG_OVERVIEW.prototype.updateCountryListNames = function () {
 
         var values = this.$COUNTRY_LIST.find("option:selected");
         var labels = [];
-        if ( typeof values == "object") {
+        if (typeof values == "object") {
             for (var i = 0; i < values.length; i++) {
                 labels.push(values[i].text);
             }
@@ -428,7 +429,7 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.createChartAreaBox = function(json, id, areacode, areanames) {
+    GHG_OVERVIEW.prototype.createChartAreaBox = function (json, id, areacode, areanames) {
 
         var obj = this.getConfigurationObject(),
             query_total = json.byarea_total,
@@ -437,7 +438,7 @@ define([
         total_obj.areacode = areacode;
         query_total = this.replaceValues(query_total, total_obj);
 
-        if ( areanames ) {
+        if (areanames) {
             $("#" + id + "_total_name").html(areanames);
         }
 
@@ -452,7 +453,7 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateTimeserieAgricultureTotal = function(json, regions) {
+    GHG_OVERVIEW.prototype.updateTimeserieAgricultureTotal = function (json, regions) {
 
         var total_obj = this.getConfigurationObject(),
             areacodes = this.getQueryAreaCodes() + ',' + regions,
@@ -464,27 +465,28 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.createTitle = function(id, sql) {
+    GHG_OVERVIEW.prototype.createTitle = function (id, sql) {
 
         var data = {};
         data.datasource = this.CONFIG.datasource;
         data.json = JSON.stringify(sql);
         var self = this;
         $.ajax({
-            type : 'POST',
-            url : this.CONFIG.baseurl + this.CONFIG.baseurl_data,
-            data : data,
-            success : function(response) {
+            type: 'POST',
+            url: this.CONFIG.baseurl + this.CONFIG.baseurl_data,
+            data: data,
+            success: function (response) {
                 $("#" + id + "_element").html(response[0][0]);
                 var value = Number(parseFloat(response[0][1]).toFixed(self.CONFIG.decimal_values)).toLocaleString();
                 $("#" + id + "_value").html(value)
             },
-            error : function(err, b, c) {}
+            error: function (err, b, c) {
+            }
         });
 
     };
 
-    GHG_OVERVIEW.prototype.createChart = function(id, sql, type, colors) {
+    GHG_OVERVIEW.prototype.createChart = function (id, sql, type, colors) {
 
         $(id).show();
         var data = {};
@@ -494,10 +496,10 @@ define([
         var chartObj = {renderTo: id, title: "title"};
         var self = this;
         $.ajax({
-            type : 'POST',
-            url : this.CONFIG.baseurl + this.CONFIG.baseurl_data,
-            data : data,
-            success : function(response) {
+            type: 'POST',
+            url: this.CONFIG.baseurl + this.CONFIG.baseurl_data,
+            data: data,
+            success: function (response) {
 
                 if (response.length > 0) {
 
@@ -511,10 +513,10 @@ define([
                                 name: i18n.pie_mu
                             };
                             chartObj.colors = colors || self.getColorsPie(response) || null;
-                            c.createPie(chartObj, response);
+                            c.createPie(chartObj, response, HighChartsConfig.pie);
                             break;
                         case "timeserie" :
-                            c.createTimeserie(chartObj, 'line', [response]);
+                            c.createTimeserie(chartObj, 'line', [response], HighChartsConfig.timeseries);
                             break;
                     }
                 }
@@ -522,16 +524,16 @@ define([
                     $('#' + id).html(i18n.no_data_to_display);
                 }
             },
-            error : function(a, b, c) {
+            error: function (a, b, c) {
                 console.log(a, b, c);
             }
         });
     };
 
-    GHG_OVERVIEW.prototype.getColorsPie = function(data) {
+    GHG_OVERVIEW.prototype.getColorsPie = function (data) {
 
         var colors = [];
-        for(var i=0; i< data.length; i++) {
+        for (var i = 0; i < data.length; i++) {
             if (this.CONFIG.colors.itemcode[data[i][4]]) {
                 colors.push(this.CONFIG.colors.itemcode[data[i][4]]);
             }
@@ -543,11 +545,11 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateTableWorld = function(json) {
+    GHG_OVERVIEW.prototype.updateTableWorld = function (json) {
 
         this.updateAreasTable(
             {
-                placeholder : "fs_world_table",
+                placeholder: "fs_world_table",
                 title: i18n.world,
                 header: {
                     column_0: "",
@@ -567,14 +569,14 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.updateAreasTable = function(config, query, areacode) {
+    GHG_OVERVIEW.prototype.updateAreasTable = function (config, query, areacode) {
 
         var years = [],
             fromYear = this.$FROM_YEAR.val(),
             toYear = this.$TO_YEAR.val(),
             obj = this.getConfigurationObject();
 
-        for(var year = fromYear; year <= toYear; year++) {
+        for (var year = fromYear; year <= toYear; year++) {
             years.push(year);
         }
 
@@ -588,26 +590,27 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.createTable = function(sql, years, config) {
+    GHG_OVERVIEW.prototype.createTable = function (sql, years, config) {
 
         var data = {};
         data.datasource = this.CONFIG.datasource;
         data.json = JSON.stringify(sql);
         $.ajax({
-            type : 'POST',
-            url : this.CONFIG.baseurl + this.CONFIG.baseurl_data,
-            data : data,
-            success : function(response) {
+            type: 'POST',
+            url: this.CONFIG.baseurl + this.CONFIG.baseurl_data,
+            data: data,
+            success: function (response) {
                 $('#' + config.placeholder).empty();
                 var table = new Table();
-                table.init(config, years, response);
+                table.init(config, years, response, i18n);
             },
-            error : function(err, b, c) {}
+            error: function (err, b, c) {
+            }
         });
 
     };
 
-    GHG_OVERVIEW.prototype.getConfigurationObject = function() {
+    GHG_OVERVIEW.prototype.getConfigurationObject = function () {
 
         return {
             lang: this.CONFIG.lang.toUpperCase(),
@@ -621,22 +624,22 @@ define([
 
     };
 
-    GHG_OVERVIEW.prototype.getQueryAreaCodes = function() {
+    GHG_OVERVIEW.prototype.getQueryAreaCodes = function () {
 
         return this.CONFIG.selected_areacodes.join(",");
     };
 
-    GHG_OVERVIEW.prototype.replaceValues = function(data, obj) {
+    GHG_OVERVIEW.prototype.replaceValues = function (data, obj) {
 
         var json = (typeof data == 'string') ? data : JSON.stringify(data);
         for (var key in obj) {
             json = this.replaceAll(json, "{{" + key.toUpperCase() + "}}", obj[key]);
         }
-        return  $.parseJSON(json);
+        return $.parseJSON(json);
 
     };
 
-    GHG_OVERVIEW.prototype.replaceAll = function(text, stringToFind, stringToReplace) {
+    GHG_OVERVIEW.prototype.replaceAll = function (text, stringToFind, stringToReplace) {
 
         try {
             var temp = text;
@@ -646,7 +649,7 @@ define([
                 index = temp.indexOf(stringToFind);
             }
             return temp;
-        }catch (e) {
+        } catch (e) {
             return text;
         }
 
